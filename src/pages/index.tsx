@@ -76,7 +76,11 @@ const Home: NextPage = () => {
   const { data, isLoading } = api.posts.getAll.useQuery();
 
   if (isLoading) {
-    return <div>Carregando...</div>;
+    return (
+      <div className="loading-animation grid h-screen w-screen animate-bounce place-items-center  overflow-x-hidden text-[8rem]">
+        🙃
+      </div>
+    );
   }
   if (!data) {
     return <div>Algo deu errado</div>;

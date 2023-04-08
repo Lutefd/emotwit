@@ -3,12 +3,14 @@ import Head from "next/head";
 // import Link from "next/link";
 import { SignIn, SignOutButton, useUser } from "@clerk/nextjs";
 
-// import { api } from "~/utils/api";
+import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
   const user = useUser();
 
+  const { data } = api.posts.getAll.useQuery();
+  console.log(data);
   return (
     <>
       <Head>
@@ -22,6 +24,11 @@ const Home: NextPage = () => {
             <SignIn path="/" routing="path" signUpUrl="/sign-up" />
           )}
           {!!user.isSignedIn && <SignOutButton />}
+        </div>
+        <div>
+          {data?.map((post) => (
+            <div key={post.id}>{post.content}</div>
+          ))}
         </div>
       </main>
     </>

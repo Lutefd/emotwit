@@ -15,8 +15,14 @@ dayjs.locale("pt-br");
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
+  const ctx = api.useContext();
   const { user } = useUser();
-  const { mutate } = api.posts.create.useMutation();
+  const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
+    onSuccess: () => {
+      setContent("");
+      void ctx.posts.getAll.invalidate();
+    },
+  });
   const [content, setContent] = useState("");
 
   if (!user) {
@@ -39,6 +45,7 @@ const CreatePostWizard = () => {
         type="text"
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        disabled={isPosting}
       />
       <button onClick={() => mutate({ content })}>Emotar</button>
     </div>
@@ -85,9 +92,11 @@ const Feed = () => {
     return <LoadingEmoji />;
   }
 
+  if (!data) return <div>Algo deu errado</div>;
+
   return (
     <div className="flex flex-col">
-      {data?.map((fullPost) => (
+      {data.map((fullPost) => (
         <PostView {...fullPost} key={fullPost.post.id} />
       ))}
     </div>
@@ -97,7 +106,8 @@ const Feed = () => {
 const Home: NextPage = () => {
   const user = useUser();
 
-  const { data } = api.posts.getAll.useQuery();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { data } = api.posts.getAll.useQuery(); // prefetch
 
   return (
     <>

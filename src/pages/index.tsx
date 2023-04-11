@@ -9,12 +9,15 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/pt-br";
 import Image from "next/image";
 import { LoadingEmoji } from "~/components/Loading";
+import { useState } from "react";
 
 dayjs.locale("pt-br");
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
   const { user } = useUser();
+  const { mutate } = api.posts.create.useMutation();
+  const [content, setContent] = useState("");
 
   if (!user) {
     return <div>Faça Login para Emotar</div>;
@@ -32,8 +35,12 @@ const CreatePostWizard = () => {
       />
       <input
         placeholder="Emote o que você está pensando"
-        className="grow bg-transparent outline-none "
+        className="grow bg-transparent outline-none"
+        type="text"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
       />
+      <button onClick={() => mutate({ content })}>Emotar</button>
     </div>
   );
 };

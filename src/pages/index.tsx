@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/pt-br";
 import Image from "next/image";
+import { LoadingEmoji } from "~/components/Loading";
 
 dayjs.locale("pt-br");
 dayjs.extend(relativeTime);
@@ -70,21 +71,26 @@ const PostView = (props: PostnUser) => {
     </div>
   );
 };
+
+const Feed = () => {
+  const { data, isLoading } = api.posts.getAll.useQuery();
+  if (isLoading) {
+    return <LoadingEmoji />;
+  }
+
+  return (
+    <div className="flex flex-col">
+      {data?.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
+    </div>
+  );
+};
+
 const Home: NextPage = () => {
   const user = useUser();
 
-  const { data, isLoading } = api.posts.getAll.useQuery();
-
-  if (isLoading) {
-    return (
-      <div className="loading-animation grid h-screen w-screen animate-bounce place-items-center  overflow-x-hidden text-[8rem]">
-        🙃
-      </div>
-    );
-  }
-  if (!data) {
-    return <div>Algo deu errado</div>;
-  }
+  const { data } = api.posts.getAll.useQuery();
 
   return (
     <>
@@ -109,11 +115,7 @@ const Home: NextPage = () => {
               </div>
             )}
           </div>
-          <div className="flex flex-col">
-            {data?.map((fullPost) => (
-              <PostView {...fullPost} key={fullPost.post.id} />
-            ))}
-          </div>
+          <Feed />
         </div>
       </main>
     </>
